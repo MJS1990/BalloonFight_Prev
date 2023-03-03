@@ -29,14 +29,14 @@ class Goblin_BT : MonoBehaviour
 
     void Start()
     {
-        goblin = GetComponent<Goblin>();
-        InitGoblinTree();
-        LinkTreeNode();
+        //goblin = GetComponent<Goblin>();
+        //InitGoblinTree();
+        //LinkTreeNode();
     }
     
     void Update()
     {
-        bt.ExecuteBT(root);
+        //bt.ExecuteBT(root);
     }
     
     void InitGoblinTree()

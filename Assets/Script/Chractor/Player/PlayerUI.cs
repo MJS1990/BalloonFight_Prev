@@ -3,32 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Player
-{
-   public class PlayerUI : MonoBehaviour
-    {
-        PlayerStatus player;
+public class PlayerUI : MonoBehaviour
+ {
+     PlayerStatus player;
 
-        public Image[] HPUI;
-        int index;
-        int prev;
+     public Image[] HPUI;
+     int index;
+     int prev;
 
-        void Awake()
-        {
-            player = GetComponent<PlayerStatus>();
+     void Awake()
+     {
+         player = GetComponent<PlayerStatus>();
 
-            index = player.HP - 1;
-            prev = player.HP;
-        }
+         index = player.HP - 1;
+         prev = player.HP;
+     }
 
-        void FixedUpdate()
-        {
-            if (player.HP != prev && player.HP >= 0)
-            {
-                HPUI[index].enabled = false;
-                index--;
-                prev--;
-            }
-        }
-    }
+     void FixedUpdate()
+     {
+         if (player.HP != prev && player.HP >= 0)
+         {
+             HPUI[index].enabled = false;
+             index--;
+             prev--;
+         }
+     }
 }

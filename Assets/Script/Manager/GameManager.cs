@@ -4,16 +4,23 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-using Player;
-
 public class GameManager : MonoBehaviour
 {
     PlayerAction player;
     public Image fadePanel;
+    SpawnManager spawnManager;
 
     private void Start()
     {
+        //spawnManager = new SpawnManager();
+        spawnManager = GetComponent<SpawnManager>();
+
         StartCoroutine(FadeOut());
+    }
+
+    private void Update()
+    {
+        spawnManager.UpdateSpawn();
     }
 
     public void MoveNextScene()
@@ -30,8 +37,11 @@ public class GameManager : MonoBehaviour
     IEnumerator CMoveNextScene()
     {
         int index = SceneManager.GetActiveScene().buildIndex + 1;
-    
-        StartCoroutine(FadeIn());
+
+        spawnManager.ReadSpawnDatas(index);
+        spawnManager.ResetTime();
+
+        StartCoroutine(FadeIn());   
         yield return new WaitForSeconds(1.25f);
     
         SceneManager.LoadScene(index);

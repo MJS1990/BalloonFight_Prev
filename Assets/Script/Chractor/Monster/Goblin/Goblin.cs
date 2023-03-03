@@ -2,11 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using Player;
-
 class Goblin : Monster
 {
     SpriteRenderer spriteRenderer;
+    Rigidbody2D Rigidbody;
+
+    Status status;
 
     public int goblinHP;
     public int goblinAttackDamage;
@@ -27,27 +28,50 @@ class Goblin : Monster
     
     void Awake()
     {
-        Initialize();
+        Rigidbody = GetComponent<Rigidbody2D>();
         
-        HP = goblinHP;
-        attackDamage = goblinAttackDamage;
+        status = GetComponent<Status>();
+        
+        //Rigidbody.gravityScale = status.DT_Status.Gravity;
 
-        rightMoveRange = originPos.x + 0.5f;
-        leftMoveRange = originPos.x - 0.5f;
+        print("Awake : " + status.DT_Status.Gravity);
+        /*
+        public int Id;
+        public EMonsterType MonsterType;
+        public float Gravity;
+        public float Velocity;
+        public float Acceleration;
+        public float AccelerationMax;
+        public int HpCount;
+        public EWeaponType WeaponType;
+         
+         */
 
-        maxRightChaseRange = rightMoveRange + 0.25f;
-        maxLeftChaseRange = leftMoveRange - 0.25f;
+        //    Initialize();
+        //   HP = goblinHP;
+        //   attackDamage = goblinAttackDamage;
+        //
+        //   rightMoveRange = originPos.x + 0.5f;
+        //   leftMoveRange = originPos.x - 0.5f;
+        //
+        //   maxRightChaseRange = rightMoveRange + 0.25f;
+        //   maxLeftChaseRange = leftMoveRange - 0.25f;
+        //
+        //   spriteRenderer = GetComponent<SpriteRenderer>();
 
-        spriteRenderer = GetComponent<SpriteRenderer>();
-
-        colAttack = GetComponent<PolygonCollider2D>();
-        anim = GetComponent<Animator>();
+        //   colAttack = GetComponent<PolygonCollider2D>();
+        //   anim = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
     }
 
+
     void Update()
     {
-        CalcAttack();
+        //    CalcAttack();
+
+        //print(status.DT_Status.HpCount);
+        print("Update : " + status.DT_Status.Gravity);
+
     }
 
     void CalcAttack() 
@@ -101,8 +125,6 @@ class Goblin : Monster
 
     override public bool Move()
     {
-        Debug.Log("Move함수");
-
         anim.SetBool("IsAttack", false);
         anim.SetBool("IsRunning", true);
 
@@ -134,8 +156,6 @@ class Goblin : Monster
 
     public bool ChaseAction(Vector2 playerPos)
     {
-        Debug.Log("Chase함수");
-
         anim.SetBool("IsRunning", true);
 
         if ((transform.position.x < maxLeftChaseRange || transform.position.x > maxRightChaseRange)) 
@@ -177,7 +197,6 @@ class Goblin : Monster
 
     override public bool Attack()
     {
-        Debug.Log("Attack함수");
         anim.SetBool("IsAttack", true);
 
         return true;

@@ -2,14 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-abstract class Monster : MonoBehaviour
+abstract class Enemy : MonoBehaviour
 {
     protected int HP { get; set; }
     protected int attackDamage { get; set; }
     public int GetAttackDamage() { return attackDamage; }
-
+    
     protected Rigidbody2D rigid { get; set; }
-
+    
     protected Vector3 originPos;
     protected int dir = 1;
     
@@ -18,35 +18,35 @@ abstract class Monster : MonoBehaviour
     
     public float attackStartRange;
     
-    protected bool iscDead; 
-    protected bool iscMove; 
-    protected bool iscChase; 
-    protected bool iscAttack; 
+    protected bool iscDead;
+    protected bool iscMove;
+    protected bool iscChase;
+    protected bool iscAttack;
     protected bool iscDamaged;
-
+    
     
     protected void Initialize()
     {
         originPos = new Vector2(transform.position.x, transform.position.y);
-        
+    
         rigid = GetComponent<Rigidbody2D>();
-
+    
         attackStartRange = 0.02f;
-
+    
         iscDead = false;
         iscMove = true;
         iscChase = false;
         iscAttack = false;
         iscDamaged = false;
     }
-    
+   
     public bool GetDeadCondition()
     {
         if (HP <= 0)
             iscDead = true;
         else
             iscDead = false;
-        
+    
         return iscDead;
     }
     
@@ -56,7 +56,7 @@ abstract class Monster : MonoBehaviour
             iscMove = false;
         else
             iscMove = true;
-
+    
         return iscMove;
     }
     
@@ -67,28 +67,28 @@ abstract class Monster : MonoBehaviour
             iscChase = false;
             return iscChase;
         }
-
+    
         dir = rigid.velocity.x > 0 ? 1 : -1;
-
+    
         RaycastHit2D rayHit = Physics2D.Raycast(rigid.position, Vector2.right * dir, 0.5f, LayerMask.GetMask("Player"));
-
+    
         if (rayHit.collider != null)
             iscChase = true;
-       
+    
         return iscChase;
     }
     
     public bool GetAttackCondition()
     {
         dir = rigid.velocity.x > 0 ? 1 : -1;
-        
+    
         RaycastHit2D rayHit = Physics2D.Raycast(rigid.position, Vector2.right * dir * attackStartRange, 0.5f, LayerMask.GetMask("Player"));
-
+    
         if (rayHit.collider != null)
             iscAttack = true;
-        else 
+        else
             iscAttack = false;
-        
+    
         return iscAttack;
     }
     
@@ -103,7 +103,7 @@ abstract class Monster : MonoBehaviour
         if (collision.tag == "PlayerAttack")
             iscDamaged = false;
     }
-
+    
     public bool GetDamagedCondition()
     {
         return iscDamaged;
