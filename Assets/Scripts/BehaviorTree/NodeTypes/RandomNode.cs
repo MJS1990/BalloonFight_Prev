@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DelegateFunc;
 
 public class RandomNode : Node
 {
@@ -23,6 +22,4 @@ public class RandomNode : Node
         int range = children.Count;
         rValue = Random.Range(0, range);
     }
-
-
 }

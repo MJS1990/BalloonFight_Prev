@@ -18,11 +18,11 @@ abstract class Monster : MonoBehaviour
     
     public float attackStartRange;
     
-    protected bool iscDead; 
-    protected bool iscMove; 
-    protected bool iscChase; 
-    protected bool iscAttack; 
-    protected bool iscDamaged;
+    protected bool isAlive; 
+    protected bool isMove; 
+    protected bool isChase; 
+    protected bool isAttack; 
+    protected bool isDamaged;
 
     
     protected void Initialize()
@@ -33,39 +33,37 @@ abstract class Monster : MonoBehaviour
 
         attackStartRange = 0.02f;
 
-        iscDead = false;
-        iscMove = true;
-        iscChase = false;
-        iscAttack = false;
-        iscDamaged = false;
+        isAlive = true;
+        isMove = true;
+        isChase = false;
+        isAttack = false;
+        isDamaged = false;
     }
     
     public bool GetDeadCondition()
     {
         if (HP <= 0)
-            iscDead = true;
-        else
-            iscDead = false;
+            isAlive = false;
         
-        return iscDead;
+        return isAlive;
     }
     
     public bool GetMoveCondition()
     {
-        if (iscChase == true || iscAttack == true)
-            iscMove = false;
+        if (isChase == true || isAttack == true)
+            isMove = false;
         else
-            iscMove = true;
+            isMove = true;
 
-        return iscMove;
+        return isMove;
     }
     
     public bool GetChaseCondition()
     {
-        if (transform.position.x < maxLeftChaseRange || transform.position.x > maxRightChaseRange || iscAttack == true)
+        if (transform.position.x < maxLeftChaseRange || transform.position.x > maxRightChaseRange || isAttack == true)
         {
-            iscChase = false;
-            return iscChase;
+            isChase = false;
+            return isChase;
         }
 
         dir = rigid.velocity.x > 0 ? 1 : -1;
@@ -73,9 +71,9 @@ abstract class Monster : MonoBehaviour
         RaycastHit2D rayHit = Physics2D.Raycast(rigid.position, Vector2.right * dir, 0.5f, LayerMask.GetMask("Player"));
 
         if (rayHit.collider != null)
-            iscChase = true;
+            isChase = true;
        
-        return iscChase;
+        return isChase;
     }
     
     public bool GetAttackCondition()
@@ -85,28 +83,28 @@ abstract class Monster : MonoBehaviour
         RaycastHit2D rayHit = Physics2D.Raycast(rigid.position, Vector2.right * dir * attackStartRange, 0.5f, LayerMask.GetMask("Player"));
 
         if (rayHit.collider != null)
-            iscAttack = true;
+            isAttack = true;
         else 
-            iscAttack = false;
+            isAttack = false;
         
-        return iscAttack;
+        return isAttack;
     }
     
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag == "PlayerAttack")
-            iscDamaged = true;
+            isDamaged = true;
     }
     
     private void OnTriggerStay2D(Collider2D collision)
     {
         if (collision.tag == "PlayerAttack")
-            iscDamaged = false;
+            isDamaged = false;
     }
 
     public bool GetDamagedCondition()
     {
-        return iscDamaged;
+        return isDamaged;
     }
     
     protected void Stop()
@@ -115,9 +113,9 @@ abstract class Monster : MonoBehaviour
         transform.position = prev;
     }
     
-    abstract public bool Dead();
-    abstract public bool Move();
-    abstract public bool Chase();
-    abstract public bool Attack();
-    abstract public bool Damaged();
+    //abstract public bool Dead();
+    //abstract public bool Move();
+    //abstract public bool Chase();
+    //abstract public bool Attack();
+    //abstract public bool Damaged();
 }

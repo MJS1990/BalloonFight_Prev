@@ -31,7 +31,7 @@ public class SpawnManager : MonoBehaviour
     {
         SpawnList = new List<DT_SpawnValues>();
         CurrentRepeat = new List<int>();
-        ReadSpawnDatas(1);
+        //ReadSpawnDatas(1); //TODO : 패트롤 테스트 후 해제
         time = 0.0f;
     }
 

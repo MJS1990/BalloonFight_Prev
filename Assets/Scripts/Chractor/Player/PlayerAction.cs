@@ -12,6 +12,9 @@ class PlayerAction : MonoBehaviour
     SpriteRenderer SpriteRenderer;
     Animator Anim;
 
+    //Test
+    Vector3 pos;
+
     void Start()
     {
     }
@@ -32,8 +35,13 @@ class PlayerAction : MonoBehaviour
     }
 
     void FixedUpdate()
-    {   
+    {
         //if (player.HP <= 0) StartCoroutine(Dead());
+    }
+
+    public Vector3 GetPosition()
+    {
+        return gameObject.transform.position;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

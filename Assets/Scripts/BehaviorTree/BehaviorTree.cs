@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DelegateFunc;
-
 
 public class BehaviorTree : MonoBehaviour
 {
@@ -18,66 +16,59 @@ public class BehaviorTree : MonoBehaviour
 
     private IEnumerator BTUpdate(Node node, float tick = 0.0f)
     {
-        if (node.children != null) 
+        if (node != null) 
         {
             switch (node.attribute)
             {
                 case Node.NodeAttribute.Root:
-                    {
-                        for (int i = 0; i < node.children.Count; i++)
-                            StartCoroutine(BTUpdate(node.children[i], node.children[i].tick));
-                        
-                        node.Execute();
-                        yield return new WaitForSeconds(tick);
+                {
+                    for (int i = 0; i < node.children.Count; i++)
+                        StartCoroutine(BTUpdate(node.children[i], node.children[i].tick));
+                    
+                    node.Execute();
+                    yield return new WaitForSeconds(tick);
 
-                        if (node.isSuccesed == false)
-                            isTreeEnable = false;
+                    if (node.isSuccesed == false)
+                        isTreeEnable = false;
 
-                        break;
-                    }
+                    break;
+                }
                 case Node.NodeAttribute.Sequence:
+                {
+                    for (int i = 0; i < node.children.Count; i++)
                     {
-                        for (int i = 0; i < node.children.Count; i++)
+                        StartCoroutine(BTUpdate(node.children[i], node.children[i].tick));
+                        if (node.children[i].isSuccesed == false)
                         {
-                            StartCoroutine(BTUpdate(node.children[i], node.children[i].tick));
-                            if (node.children[i].isSuccesed == false)
-                            {
-                                node.isSuccesed = false;
-                                break;
-                            }
+                            node.isSuccesed = false;
+                            break;
                         }
-
-                        yield return new WaitForSeconds(tick);
-
-                        break;
                     }
+
+                    yield return new WaitForSeconds(tick);
+
+                    break;
+                }
                 case Node.NodeAttribute.Selector:
+                {
+                    for (int i = 0; i < node.children.Count; i++)
                     {
-                        for (int i = 0; i < node.children.Count; i++)
-                        {
-                            StartCoroutine(BTUpdate(node.children[i], node.children[i].tick));
-                        }
-
-                        node.Execute();
-                        yield return new WaitForSeconds(tick);
-
-                        break;
+                        StartCoroutine(BTUpdate(node.children[i], node.children[i].tick));
                     }
-                case Node.NodeAttribute.Inverse:
-                    {
-                        StartCoroutine(BTUpdate(node.children[0], node.children[0].tick));
 
-                        node.Execute();
-                        yield return new WaitForSeconds(tick);
+                    node.Execute();
+                    yield return new WaitForSeconds(tick);
 
-                        break;
-                    }
+                    break;
+                }
+                case Node.NodeAttribute.Task:
+                {
+                    node.Execute();
+                    yield return new WaitForSeconds(tick);
+
+                    break;
+                }
             }
-        }
-        else
-        {
-            node.Execute();
-            yield return new WaitForSeconds(tick);
         }
     }
 

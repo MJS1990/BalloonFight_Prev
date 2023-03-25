@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DelegateFunc;
 
 public abstract class Node
 {
@@ -10,17 +9,15 @@ public abstract class Node
         Root = 0,
 
         Sequence,
-        Inverse,
         Selector, 
+
+        Task,
 
         //Decorator
         If,
         Loop,
         Fixed,
         Random,
-
-        Condition, 
-        Action,
     }
 
     public NodeAttribute attribute;
