@@ -6,21 +6,57 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    PlayerAction player;
+    private static GameManager instance = null;
+
+    [SerializeField]
+    private GameObject player;
+
+    PlayerAction playerAction;
     public Image fadePanel;
-    SpawnManager spawnManager;
+    MonsterSpawner spawner;
 
     private void Start()
     {
-        //spawnManager = new SpawnManager();
-        spawnManager = GetComponent<SpawnManager>();
+        instance = this;
+
+        spawner = GetComponent<MonsterSpawner>();
 
         StartCoroutine(FadeOut());
+
+        //Test Spawn
+        //spawner.ReadSpawnDatas(1);
+    }
+
+    public static GameManager Get()
+    {
+        if (!instance)
+            return null;
+
+        return instance;
+    }
+
+    public GameObject GetPlayer()
+    {
+        if (player == null)
+            return null;
+
+        return player;
     }
 
     private void Update()
     {
-        spawnManager.UpdateSpawn();
+        spawner.UpdateSpawn();
+        //if(spawner.spawnId.Count > 0)
+        //{
+        //    print("==========================");
+        //    while(spawner.spawnId.Count > 0)
+        //    {
+        //        if (spawner.spawnId.Count == 0) break;
+        //
+        //        print("spawnId : " + spawner.spawnId.Dequeue());
+        //    }
+        //    print("==========================");
+        //}
     }
 
     public void MoveNextScene()
@@ -38,8 +74,8 @@ public class GameManager : MonoBehaviour
     {
         int index = SceneManager.GetActiveScene().buildIndex + 1;
 
-        spawnManager.ReadSpawnDatas(index);
-        spawnManager.ResetTime();
+        spawner.ReadSpawnDatas(index);
+        spawner.ResetTime();
 
         StartCoroutine(FadeIn());   
         yield return new WaitForSeconds(1.25f);

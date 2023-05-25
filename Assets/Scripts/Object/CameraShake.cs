@@ -4,18 +4,50 @@ using UnityEngine;
 
 public class CameraShake : MonoBehaviour
 {
-    public Vector3 dir = new Vector3(1.0f, 0.0f, 0.0f);
-    public float shakeFactor = 1.0f;
+    private static CameraShake instance = null;
+
+    public float YAxis_shakeLength = 1.0f;
+    public float XAxis_shakeLength = 1.0f;
+
+    public float shakeSpeed = 1.0f;
+    float amplitude = 0.0f;    
+    public float shakeTime = 1.0f;
+
+    bool bShake = false;
 
     void Start()
     {
-        shakeFactor *= 45.0f;
+        instance = this;
+    }
+
+    public static CameraShake Get()
+    {
+        if (!instance)
+            return null;
+
+        return instance;
     }
 
     void FixedUpdate()
     {
-        print(Mathf.Cos(shakeFactor * Time.deltaTime));
+        if (bShake)
+            Shake();
+    }
 
-        //gameObject.transform.position += dir * Mathf.Sin(shakeFactor * Time.deltaTime);
+    public bool GetbShake() { return bShake; }
+    public void SetbShake(bool val) { bShake = val; }
+
+    void Shake()
+    {
+        amplitude += Time.deltaTime * shakeSpeed;
+        
+        gameObject.transform.position = new Vector3(gameObject.transform.position.x + (XAxis_shakeLength * Mathf.Sin((amplitude))), gameObject.transform.position.y + (YAxis_shakeLength * Mathf.Sin((amplitude))), gameObject.transform.position.z);
+
+        if (amplitude >= shakeTime)
+        {
+            bShake = false;
+            amplitude = 0.0f;
+            gameObject.transform.position = new Vector3(transform.parent.gameObject.transform.position.x, transform.parent.gameObject.transform.position.y, gameObject.transform.position.z);
+        }
     }
 }

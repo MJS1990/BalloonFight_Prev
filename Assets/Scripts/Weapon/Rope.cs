@@ -16,6 +16,9 @@ public class Rope : MonoBehaviour
     public Vector2 Weight = new Vector2(0.0f, -4.5f);
     Vector2[] colliderPositions;
 
+    //Test
+    public float RophMoveLength = 1.0f;
+
 
     [Space(10f)]
     public Transform StartTransform;
@@ -117,7 +120,7 @@ public class Rope : MonoBehaviour
             Vector2 dir = (Joints[i + 1].currentPos - Joints[i].currentPos).normalized;
 
             Vector2 movement = dir * offset;
-
+            
             if (i == 0)
             {
                 Joints[i + 1].currentPos += movement;
@@ -136,7 +139,9 @@ public class Rope : MonoBehaviour
         for(int i = 0; i < Joints.Count; i++)
         {
             Vector2 dir = Joints[i].currentPos - Joints[i].prevPos;
-            RaycastHit2D hit = Physics2D.CircleCast(Joints[i].currentPos, RophWidth * 0.5f, dir.normalized, 0.0f, (-1) - (1 << 12));
+            //RaycastHit2D hit = Physics2D.CircleCast(Joints[i].currentPos, RophWidth * 0.5f, dir.normalized, 0.0f, (-1) - (1 << 12));
+            //Attachment, Projectile, Weapon_Rotate
+            RaycastHit2D hit = Physics2D.CircleCast(Joints[i].currentPos, RophWidth * 0.5f, dir.normalized, 0.0f, (-1) - ((1 << 12) + (1 << 13) + (1 << 15)));
 
             if (hit)
             {
