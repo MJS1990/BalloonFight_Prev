@@ -16,26 +16,14 @@ public class PlayerStatus : MonoBehaviour
     	Max
     };
 
-    enum EMonsterType
-    {
-        
-    }
-
-    enum EWeaponType
-    {
-
-    }
-
     public struct StatusValues
     {
         int Id;
-        EMonsterType MonsterType;
         float Gravity;
         float Velocity;
         float Acceleration;
         float AccelerationMax;
         int HpCount;
-        EWeaponType Weapon;
     }
 
     public int MaxHP;

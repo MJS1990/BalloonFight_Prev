@@ -6,17 +6,31 @@ using UnityEngine.Animations;
 class PlayerAction : MonoBehaviour
 {
     PlayerStatus status;
-    
+
     float h;
     Rigidbody2D Rigidbody;
     SpriteRenderer SpriteRenderer;
     Animator Anim;
 
-    //Test
-    Vector3 pos;
+    [SerializeField]
+    private float moveSpeed = 1.0f;
+    [SerializeField]
+    private float jumpPower = 1.0f;
+    [SerializeField]
+    private float stopTime = 1.5f;
 
+    //Test/////////////////////////////////////////////////
+    Vector3 pos;
+    Vector2 prevPos;
+    bool isAttacking;
+
+    public Effect effect;
+    ////////////////////////////////////////////////////////
+
+    
     void Start()
     {
+
     }
 
     private void Awake()
@@ -26,17 +40,36 @@ class PlayerAction : MonoBehaviour
         Rigidbody = GetComponent<Rigidbody2D>();
         SpriteRenderer = GetComponent<SpriteRenderer>();
         Anim = GetComponent<Animator>();
+
+        isAttacking = false;
+        
+        //if(clips[0] != null)
+        //{
+        //    animation.clip = clips[0];
+        //    //animation.clip.legacy = true;
+        //}
     }
 
     void Update()
     {
         InputMove();
         InputJump();
+
     }
 
     void FixedUpdate()
     {
         //if (player.HP <= 0) StartCoroutine(Dead());
+
+        if (CombatManager.Get().bPlayerAttackHit)
+        {
+            //OnAttackHit();
+            StartCoroutine(OnAttackHit());
+            //Invoke("OffAttackHit", 0.7f);
+        }
+
+        //if (Input.GetButton("TestButton1"))
+        //    animation.Play("Smoke");
     }
 
     public Vector3 GetPosition()
@@ -55,8 +88,11 @@ class PlayerAction : MonoBehaviour
 
         if (collision.gameObject.layer == 7) //Monster
         {
-            int dir = transform.position.x - collision.gameObject.transform.position.x > 0 ? 1 : -1;
-            Rigidbody.AddForce(new Vector2(dir, 0.6f) * 0.7f, ForceMode2D.Impulse);
+            //int dir = transform.position.x - collision.gameObject.transform.position.x > 0 ? 1 : -1;
+            Vector2 dir = transform.position - collision.gameObject.transform.position;
+
+            //Rigidbody.AddForce(new Vector2(dir, 0.6f) * 0.7f, ForceMode2D.Impulse);
+            Rigidbody.AddForce(dir * 0.7f, ForceMode2D.Impulse);
         }
 
         if (collision.gameObject.layer == 9) //MonsterAttack
@@ -80,44 +116,16 @@ class PlayerAction : MonoBehaviour
     //    }
     //}
 
-    void OnDamaged(Vector2 enemyPos, int damage)
-    {
-        for (int i = 1; i <= damage; i++)
-        {
-            if (i > status.HP) break;
-    
-            int index = status.HP - i;
-        }
-    
-        status.HP -= damage;
-        SpriteRenderer.color = new Color(1, 1, 1, 0.4f);
-    
-        int dir = transform.position.x - enemyPos.x > 0 ? 1 : -1;
-        Rigidbody.AddForce(new Vector2(dir, 0.6f) * 0.5f, ForceMode2D.Impulse);
-    
-        gameObject.layer = 6;
-        Anim.SetBool("IsHit", true);
-    
-        Invoke("OffDamaged", 0.8f);
-    }
-
-    void OffDamaged()
-    {
-        SpriteRenderer.color = new Color(1, 1, 1, 1);
-        Anim.SetBool("IsHit", false);
-        gameObject.layer = 0;
-    }
-
     //void ReturnAnimSpeed()
     //{
     //    Anim.speed = 1.0f;
     //}
-
+    
     void InputMove()
     {
-        if (gameObject.layer == 6) return;
+        if (gameObject.layer == 6 || isAttacking) return;
 
-        h = Input.GetAxisRaw("Horizontal") * 0.003f;
+        h = Input.GetAxisRaw("Horizontal") * 0.003f * moveSpeed; //TODO : 임시변수
         Rigidbody.AddForce(Vector2.right * h, ForceMode2D.Impulse);
 
         if (Input.GetButton("Horizontal"))
@@ -134,9 +142,35 @@ class PlayerAction : MonoBehaviour
         }
     }
 
-    void InputJump()
+    public void InputLeftTop()
     {
         if (gameObject.layer == 6) return;
+
+        Anim.SetBool("IsFlying", true);
+        SpriteRenderer.flipX = false;
+
+        Rigidbody.AddForce(new Vector2(-moveSpeed * 0.5f, jumpPower * 5), ForceMode2D.Impulse);
+        //Rigidbody.AddForce(Vector2.right * -moveSpeed, ForceMode2D.Impulse);
+        //Rigidbody.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+        //Rigidbody.velocity = new Vector2((Rigidbody.velocity.normalized.x * 0.02f), Rigidbody.velocity.y);
+    }
+
+    public void InputRightTop()
+    {
+        if (gameObject.layer == 6) return;
+
+        Anim.SetBool("IsFlying", true);
+        SpriteRenderer.flipX = true;
+
+        Rigidbody.AddForce(new Vector2(moveSpeed * 0.5f , jumpPower * 5), ForceMode2D.Impulse);
+        //Rigidbody.AddForce(Vector2.right * moveSpeed, ForceMode2D.Impulse);
+        //Rigidbody.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+        //Rigidbody.velocity = new Vector2((Rigidbody.velocity.normalized.x * 0.02f), Rigidbody.velocity.y);
+    }
+
+    void InputJump()
+    {
+        if (gameObject.layer == 6 || isAttacking) return;
 
         if (Input.GetButtonDown("Fire2"))
         {
@@ -159,10 +193,30 @@ class PlayerAction : MonoBehaviour
         }
         //Anim.SetFloat("IsFalling", Rigidbody.velocity.y);
     }
-    public void VelocityZero()
+
+    IEnumerator OnAttackHit()
     {
+        isAttacking = true;
+        prevPos = Rigidbody.velocity;
         Rigidbody.velocity = Vector2.zero;
+        CameraShake.Get().SetbShake(true);
+
+        CombatManager.Get().bPlayerAttackHit = false;
+
+
+        yield return new WaitForSeconds(stopTime);
+        isAttacking = false;
+        Rigidbody.velocity = prevPos;
     }
+
+    void OffAttackHit()
+    {
+        Rigidbody.velocity = prevPos;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+
 
     //public IEnumerator Dead()
     //{
@@ -174,4 +228,32 @@ class PlayerAction : MonoBehaviour
     //    
     //    yield return true;
     //}
+
+    void OnDamaged(Vector2 enemyPos, int damage)
+    {
+        for (int i = 1; i <= damage; i++)
+        {
+            if (i > status.HP) break;
+
+            int index = status.HP - i;
+        }
+
+        status.HP -= damage;
+        SpriteRenderer.color = new Color(1, 1, 1, 0.4f);
+
+        int dir = transform.position.x - enemyPos.x > 0 ? 1 : -1;
+        Rigidbody.AddForce(new Vector2(dir, 0.6f) * 0.5f, ForceMode2D.Impulse);
+
+        gameObject.layer = 6;
+        Anim.SetBool("IsHit", true);
+
+        Invoke("OffDamaged", 0.8f);
+    }
+
+    void OffDamaged()
+    {
+        SpriteRenderer.color = new Color(1, 1, 1, 1);
+        Anim.SetBool("IsHit", false);
+        gameObject.layer = 0;
+    }
 }
