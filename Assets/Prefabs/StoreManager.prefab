@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2218989733588356689
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7330789432213347176}
+  - component: {fileID: 1969965552775546145}
+  m_Layer: 0
+  m_Name: StoreManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7330789432213347176
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2218989733588356689}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 784.7451, y: 426.34763, z: 3.566831}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1969965552775546145
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2218989733588356689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12c6c925d9eb88347811adf1d78a796b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  items:
+  - {fileID: 9195558016462673275, guid: 129090c37e8ac3e45b99859a8bcdf74b, type: 3}
+  - {fileID: 3620722441388024594, guid: 84bb677287886dd4f9e521a045cbc112, type: 3}
+  - {fileID: 1319284383300192393, guid: dfcdee7ec3e272342889cc0795fa7fcf, type: 3}
+  - {fileID: 5579457417901279507, guid: 7e0faac7de748a44fa46b00c6fe421fd, type: 3}
+  - {fileID: 1611314544375968165, guid: 92e4c8960b17460478a0d0efc5429393, type: 3}
+  - {fileID: 799343451947391383, guid: b722c35e2321e9245a25a0b6b5d84d2f, type: 3}
+  - {fileID: 5234105706289546376, guid: 5bfa39c42621ad4428f2159009811860, type: 3}
+  - {fileID: 6286523904307766529, guid: 0ab19c2c6d281634687a7e6997f52acd, type: 3}
+  goldText: {fileID: 9210107908456868638, guid: 66aa8989fe734954f90ede7faf171b6f, type: 3}
+  itemComment: {fileID: 5803870863212642299, guid: 73151e68825515a4db04b9a6061a71b4, type: 3}
