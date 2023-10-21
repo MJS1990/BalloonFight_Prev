@@ -7,21 +7,25 @@ TagManager:
   - Terrain
   - Object
   - UI
-  - Goblin
   - PlayerAttack
   - MonsterAttack
   - Attachment
   - Roph
   - Projectile
   - Weapon
+  - Monster_Common
+  - Monster_Elite
+  - Monster_Boss
+  - Platform
+  - Monster_Shooter
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Projectile_Enemy
   - Water
   - UI
-  - Player_NoneDamage
+  - NoneDamaged
   - Monster
   - Player
   - Monster_Attack
@@ -31,11 +35,11 @@ TagManager:
   - Projectile
   - Weapon
   - Weapon_Rotate
-  - Weapon_Attach
+  - Weapon_Gun
   - Terrain
-  - 
-  - 
-  - 
+  - Monster_Groggy
+  - ' Invincibility'
+  - Weapon_Enemy
   - 
   - 
   - 
