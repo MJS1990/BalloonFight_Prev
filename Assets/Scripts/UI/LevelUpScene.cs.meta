@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 45360d5a064983449b0df315e1b02454
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - listPos: {instanceID: 0}
+  - buttonPos: {instanceID: 0}
+  - expBar: {fileID: 4564535788030348935, guid: 4c30961be9942654d9cab65e2c22ef9b, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
