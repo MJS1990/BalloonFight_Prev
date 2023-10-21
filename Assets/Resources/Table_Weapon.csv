@@ -1,0 +1,11 @@
+Id,GroupKey,Type,Level,IsMaxLevel,Atk,ProjectileList
+10001,Gun_1000,Gun,1,,1,Direct_1000
+10002,Gun_1000,Gun,2,,2,Direct_1000
+10003,Gun_1000,Gun,3,,3,"Direct_1000, Gravitiy_2000"
+10004,Gun_1000,Gun,4,,4,"Direct_1000, Gravitiy_2000"
+10005,Gun_1000,Gun,5,1,5,"Direct_1000, Gravitiy_2000, Hoaming_3000"
+11001,Gun_1100,Gun,1,,2,Direct_1000
+11002,Gun_1100,Gun,2,,4,Direct_1000
+11003,Gun_1100,Gun,3,,6,"Direct_1000, Gravitiy_2000"
+11004,Gun_1100,Gun,4,,8,"Direct_1000, Gravitiy_2000"
+11005,Gun_1100,Gun,5,1,10,"Direct_1000, Gravitiy_2000, Hoaming_3000"
