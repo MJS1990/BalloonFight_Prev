@@ -154,7 +154,7 @@ public class GameManager : MonoBehaviour
 
             //¾À ·Îµå
             int r = UnityEngine.Random.Range(0, count);
-            SceneManager.LoadScene("Stage_" + r.ToString());
+            SceneManager.LoadScene("Stage_"+index.ToString()+"_" + r.ToString());
         }
     }
 
