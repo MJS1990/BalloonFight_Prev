@@ -34,6 +34,7 @@ public class Monster : MonoBehaviour
     //PathFind
     //protected Monster_Pathfinding pathfinder;
     protected List<Vector2Int> chasePath;
+    protected GameObject target;
     protected Vector3 targetPos;
     protected Vector3 pathPointPos;
     protected Vector2 pathMoveOffset;
@@ -70,7 +71,10 @@ public class Monster : MonoBehaviour
     public Monster Get() { return this; }
     public MonsterStatus GetStatus() { return status; }
     public MonsterState GetState() { return state; }
-
+    public void Awake()
+    {
+        target = GameObject.Find("Player");
+    }
 
     public bool Patrol()
     {
