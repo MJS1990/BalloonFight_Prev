@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Monster_Shooter : Monster
 {
@@ -68,7 +69,7 @@ public class Monster_Shooter : Monster
 
         if (dis < 4.5f && moveOffsetTime >= 2.0f && !state.IsGroggy())
         {
-            targetPos = player.transform.position;
+            targetPos = target.transform.position;
         }
         ////////////////////////////////////////////////////////////////////////////
 
@@ -94,6 +95,11 @@ public class Monster_Shooter : Monster
 
         if (GetStatus().GetHp() <= 0) state.SetGroggy();
     }
+
+    public Vector3 GetTargetPos()
+    {
+        return target.transform.position;
+    }    
 
     public override void GetDamage(int damage, Vector3 dir)
     {
