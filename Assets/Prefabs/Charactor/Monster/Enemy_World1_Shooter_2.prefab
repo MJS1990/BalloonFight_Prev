@@ -324,7 +324,7 @@ PrefabInstance:
       objectReference: {fileID: 8933089732915279232}
     - target: {fileID: 8927671272610377120, guid: 0e2469bb926f5864aabfb534f9b3ba8f, type: 3}
       propertyPath: m_Name
-      value: Weapons_Enemy_World1_1 2
+      value: Weapons_Enemy_World1_2
       objectReference: {fileID: 0}
     - target: {fileID: 8927671272610377148, guid: 0e2469bb926f5864aabfb534f9b3ba8f, type: 3}
       propertyPath: m_LocalScale.x
