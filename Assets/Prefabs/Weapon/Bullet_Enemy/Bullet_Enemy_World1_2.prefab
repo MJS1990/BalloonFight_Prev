@@ -294,7 +294,7 @@ MonoBehaviour:
   impactEffect: {fileID: 4516356867474795490, guid: 6e9f78c1e0f266e45a248568661eab80, type: 3}
   damage: 5
   fireType: 0
-  speed: 1
+  speed: 0.1
   bImpact: 0
   bFire: 0
 --- !u!50 &3332289268483019569
