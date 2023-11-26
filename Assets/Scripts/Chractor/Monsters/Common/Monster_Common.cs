@@ -22,6 +22,7 @@ public class Monster_Common : Monster
         
         //Status
         status = GetComponent<MonsterStatus>();
+        status.SetID(id);
         maxhp = status.GetHp();
         currenthp = maxhp;
         //status.GetStatus(id);
@@ -32,8 +33,12 @@ public class Monster_Common : Monster
         pathPointPos = new Vector3();
         //Patrol
         patrolPath = GetComponentInChildren<LineRenderer>();
+        patrolPoints = new List<Vector3>();
+        for (int i = 0; i < patrolPath.positionCount; i++)
+            patrolPoints.Add(patrolPath.GetPosition(i));
+        patrolPath.gameObject.SetActive(false);
         //patrolPath = GetComponent<LineRenderer>();
-        
+
         knockBackDir = new Vector3();
         kTime = 0.0f;
         knockBackOrigin = knockBackPower;
@@ -84,12 +89,12 @@ public class Monster_Common : Monster
         if (state.IsDead()) deadTime += Time.deltaTime;
 
         //Player탐지////////////////////////////////////////////////////////////////
-        Vector3 vec = transform.position - player.gameObject.transform.position;
+        Vector3 vec = transform.position - target.transform.position;
         float dis = Mathf.Sqrt(Mathf.Abs(vec.x) + Mathf.Abs(vec.y));
 
         if(dis < 4.5f && moveOffsetTime >= 2.0f && !state.IsGroggy())
         {
-            targetPos = player.transform.position;
+            targetPos = target.transform.position;
             moveOffsetTime = 0.0f;
             state.SetMove();
         }
@@ -102,7 +107,7 @@ public class Monster_Common : Monster
 
         if (bDamaged)
         {
-            bDamaged = true;
+            //bDamaged = true;
             NoneDamaged(knockbackTime);
             gameObject.layer = 19; 
             kTime += Time.deltaTime;
@@ -123,7 +128,7 @@ public class Monster_Common : Monster
         if (GetStatus().GetHp() <= 0) state.SetGroggy();
     }
 
-    public Vector3 GetTargetPos() { return player.transform.position; }
+    public Vector3 GetTargetPos() { return target.transform.position; }
     
     public override void GetDamage(int damage, Vector3 dir)
     {
@@ -194,7 +199,7 @@ public class Monster_Common : Monster
     {
         gameObject.layer = 19;
 
-        Attachment at = player.gameObject.GetComponentInChildren<Attachment>();
+        Attachment at = target.GetComponentInChildren<Attachment>();
         if (at.transform.position.x > transform.position.x)
             knockBackDir = new Vector2(-1, 1);
         else
@@ -212,11 +217,12 @@ public class Monster_Common : Monster
 
         rigid.AddForce(new Vector2(knockBackDir.x * knockBackPower * 2, knockBackDir.y * knockBackPower * 2), ForceMode2D.Force);
 
-        Destroy(this.gameObject, 1.5f); //2번째 파라미터 : 함수 콜 지연시간
-
-        PlayerStatus playerStatus = player.gameObject.GetComponent<PlayerStatus>();
+        PlayerStatus playerStatus = target.GetComponent<PlayerStatus>();
         playerStatus.SetExp(status.GetExp());
         status.exp = 0;
+        state.SetDead();
+        
+        Destroy(this.gameObject, 1.5f); //2번째 파라미터 : 함수 콜 지연시간
     }
 
     private void OnCollisionEnter2D(Collision2D col)
