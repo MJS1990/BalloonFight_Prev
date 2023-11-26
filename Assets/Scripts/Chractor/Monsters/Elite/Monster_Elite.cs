@@ -6,65 +6,12 @@ public class Monster_Elite : Monster
 {
     int id { get; }
 
-    protected Rigidbody2D rigid;
-    protected Animator anim;
-    protected SpriteRenderer sprite;
-
-    //MonsterState state;
-    //MonsterStatus status;
-    //public PlayerStatus player;
-    //
-    //protected int maxhp;
-    //protected int currenthp;
-    //public float attachmentImpact;// = 2.0f;
-    //public float moveSpeed = 5.0f;
-    //public float minSpeed = 5.0f;
-    //public float maxSpeed = 8.0f;
-    //public float moveOffset = 0.05f;
-    //public float moveForce = 0.0f;
-    //public float jumpPower = 5.0f;
-    //protected float moveOffsetTime = 0.0f;
-    //
-    ////Patrol
-    //protected LineRenderer patrolPath;
-    //protected int patrolIndex = 0;
-    //
-    ////PathFind
-    Monster_Pathfinding pathfinder;
-    //protected List<Vector2Int> chasePath;
-    //protected Vector3 targetPos;
-    //protected Vector3 pathPointPos;
-    //protected Vector2 pathMoveOffset;
-    //protected int pathIndex = 0;
-    //protected bool bArrived = false;
-    //protected float chaseTime = 0.0f;
-    //
-    //protected bool bDamaged = false;
-    ////int takeDamage = 0;
-    //[SerializeField]
-    //protected float knockBackPower;
-    //protected Vector3 knockBackDir;
-    //[SerializeField]
-    //protected float knockbackTime;
-    //protected float kTime;
-    //
-    bool bResetPath = false;
-    //
-    ////Test
-    //protected int PatrolCount = 0;
-    //protected int ChaseCount = 0;
-    //protected int MoveCount = 0;
-    //protected int HittedCount = 0;
-    //bool bChase = true;
-    //
-    //public Monster Get() { return this; }
-    //public MonsterStatus GetStatus() { return status; }
-    //public MonsterState GetState() { return state; }
+    Rigidbody2D rigid;
+    Animator anim;
+    SpriteRenderer sprite;
 
     void Start()
     {
-        print("Call Monster");
-
         //Components
         sprite = GetComponent<SpriteRenderer>();
         rigid = GetComponent<Rigidbody2D>();
@@ -74,6 +21,7 @@ public class Monster_Elite : Monster
 
         //Status
         status = GetComponent<MonsterStatus>();
+        status.SetID(id);
         maxhp = status.GetHp();
         currenthp = maxhp;
         //status.GetStatus(id);
@@ -84,98 +32,120 @@ public class Monster_Elite : Monster
         pathPointPos = new Vector3();
         //Patrol
         patrolPath = GetComponentInChildren<LineRenderer>();
+        patrolPoints = new List<Vector3>();
+        for(int i = 0; i < patrolPath.positionCount; i++)
+            patrolPoints.Add(patrolPath.GetPosition(i));
+        patrolPath.gameObject.SetActive(false);
+
         //patrolPath = GetComponent<LineRenderer>();
-
-        //Chase
-        pathfinder = GetComponent<Monster_Pathfinding>();
-        chasePath = new List<Vector2Int>();
-
-        targetPos = new Vector3();
-        pathPointPos = new Vector3();
-        pathMoveOffset = new Vector3(); 
 
         knockBackDir = new Vector3();
         kTime = 0.0f;
-
-        state.SetIdle();
+        knockBackOrigin = knockBackPower;
     }
-    public Vector3 GetTargetPos() { return player.transform.position; }
+
     private void Update()
     {
+        //if (bDamaged)
+        //{
+        //    bDamaged = true;
+        //
+        //    kTime += Time.deltaTime;
+        //    if (kTime >= knockbackTime)
+        //    {
+        //        bDamaged = false;
+        //        kTime = 0.0f;
+        //    }
+        //
+        //    transform.position += new Vector3(knockBackDir.x * knockBackPower * Time.deltaTime, knockBackDir.y * knockBackPower * Time.deltaTime, transform.position.z);
+        //}
+
+        if (moveSpeed <= 0)
+            moveSpeed = UnityEngine.Random.Range(minSpeed, maxSpeed);
     }
 
     void FixedUpdate()
     {
-        moveOffsetTime += Time.deltaTime;
-        chaseTime += Time.deltaTime;
+        if (state.IsIdle())
+        {
+            Patrol();
+        }
+        else if (state.IsMove())
+        {
+            MoveTo();
+        }
+        else if (state.IsHitted())
+        {
+            Hitted();
+        }
+        else if (state.IsGroggy() && deadTime == 0)
+        {
+            Groggy();
+        }
+        else if (state.IsDead())
+        {
+            Dead();
+        }
 
-        if (moveSpeed <= 0)
-            moveSpeed = UnityEngine.Random.Range(minSpeed, maxSpeed);
-        
+        if (state.IsDead()) deadTime += Time.deltaTime;
+
+        //Player탐지////////////////////////////////////////////////////////////////
+        Vector3 vec = transform.position - target.transform.position;
+        float dis = Mathf.Sqrt(Mathf.Abs(vec.x) + Mathf.Abs(vec.y));
+
+        if (dis < playerDetectionRange && moveOffsetTime >= 2.0f && !state.IsGroggy())
+        {
+            targetPos = target.transform.position;
+            moveOffsetTime = 0.0f;
+            state.SetMove();
+        }
+        //else
+        //{
+        //    state.SetIdle();
+        //}
+        moveOffsetTime += Time.deltaTime;
+        ////////////////////////////////////////////////////////////////////////////
+
         if (bDamaged)
         {
-            bDamaged = true;
-
+            //bDamaged = true;
+            NoneDamaged(knockbackTime);
+            gameObject.layer = 19;
             kTime += Time.deltaTime;
             if (kTime >= knockbackTime)
             {
                 bDamaged = false;
+                gameObject.layer = 7;
                 kTime = 0.0f;
+                knockBackPower = knockBackOrigin;
             }
 
-            transform.position += new Vector3(knockBackDir.x * knockBackPower * Time.deltaTime, knockBackDir.y * knockBackPower * Time.deltaTime, transform.position.z);
+            //transform.position += new Vector3(knockBackDir.x * knockBackPower * Time.deltaTime, knockBackDir.y * knockBackPower * Time.deltaTime, transform.position.z);
+            rigid.AddForce(new Vector2(knockBackDir.x * knockBackPower, knockBackDir.y * knockBackPower), ForceMode2D.Force);
+            if (knockBackPower >= 0)
+                knockBackPower *= 0.7f;
         }
+
+        if (GetStatus().GetHp() <= 0) state.SetGroggy();
     }
 
-    public override bool Chase()
-    {
-        if (pathIndex >= chasePath.Count || chasePath.Count <= 0)
-        {
-            pathIndex = 0;
-            chasePath.Clear();
-            state.SetIdle();
-            return false;
-        }
-
-        float x = (float)chasePath[pathIndex].x;// + pathMoveOffset.x;
-        float y = (float)chasePath[pathIndex].y;// + pathMoveOffset.y;
-        pathPointPos = new Vector3(x, y, 0.0f);
-
-        targetPos = pathPointPos;
-        bArrived = MoveTo();
-
-        if (bArrived)
-        {
-            if (pathIndex == chasePath.Count - 1)
-            {
-                pathIndex = 0;
-                chasePath.Clear();
-                state.SetIdle();
-
-                return true;
-            }
-
-            pathIndex++;
-            pathMoveOffset.x = UnityEngine.Random.Range(-0.5f, 0.5f);
-            pathMoveOffset.y = UnityEngine.Random.Range(-0.5f, 0.5f);
-
-            return false;
-        }
-
-        return false;
-    }
+    public Vector3 GetTargetPos() { return target.transform.position; }
 
     public override void GetDamage(int damage, Vector3 dir)
     {
         knockBackDir = dir;
         bDamaged = true;
+        state.SetHitted();
         status.SetDamage(damage);
     }
 
     public override bool Hitted()
     {
-        if (status.GetHp() <= 0)
-            state.SetDead();
+        if (status.GetHp() <= 0 && !state.IsGroggy())
+        {
+            state.SetGroggy();
+            return false;
+        }
         else
             End_Hitted();
 
@@ -184,15 +154,59 @@ public class Monster_Elite : Monster
 
     public override void End_Hitted()
     {
-        //state.SetIdle();
+        state.SetIdle();
+    }
+
+    public override bool NoneDamaged(float time)
+    {
+        if (!state.IsGroggy())
+        {
+            gameObject.layer = 6;
+        }
+
+
+        noneDamageTime += Time.deltaTime;
+
+        if (sprite.color.a == 1.0f)
+            sprite.color = new Color(sprite.color.r, sprite.color.g, sprite.color.b, 0.3f);
+        else
+            sprite.color = new Color(sprite.color.r, sprite.color.g, sprite.color.b, 1.0f);
+
+        if (time != 0 && (noneDamageTime >= time || !state.IsGroggy()))
+        {
+
+            if (sprite.color.a != 1.0f)
+                sprite.color = new Color(sprite.color.r, sprite.color.g, sprite.color.b, 1.0f);
+            gameObject.layer = 7;
+            noneDamageTime = 0.0f;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public override bool Groggy()
+    {
+        gameObject.layer = 18;
+        rigid.mass = 1.0f;
+        rigid.gravityScale = 1.0f;
+        NoneDamaged(0);
+
+        return true;
     }
 
     public override bool Dead()
     {
-        //애니메이션 재생
-        PlayerStatus playerStatus = player.gameObject.GetComponent<PlayerStatus>();
-        playerStatus.SetExp(status.GetExp());
+        gameObject.layer = 19;
 
+        Attachment at = target.GetComponentInChildren<Attachment>();
+        if (at.transform.position.x > transform.position.x)
+            knockBackDir = new Vector2(-1, 1);
+        else
+            knockBackDir = new Vector2(1, 1);
+
+        //애니메이션 재생
         End_Dead();
 
         return true;
@@ -200,7 +214,16 @@ public class Monster_Elite : Monster
 
     public override void End_Dead()
     {
-        Destroy(this.gameObject); //2번째 파라미터 : 함수 콜 지연시간
+        NoneDamaged(2.5f);
+
+        rigid.AddForce(new Vector2(knockBackDir.x * knockBackPower * 2, knockBackDir.y * knockBackPower * 2), ForceMode2D.Force);
+
+        PlayerStatus playerStatus = target.GetComponent<PlayerStatus>();
+        playerStatus.SetExp(status.GetExp());
+        status.exp = 0;
+        state.SetDead();
+
+        Destroy(this.gameObject, 1.5f); //2번째 파라미터 : 함수 콜 지연시간
     }
 
     private void OnCollisionEnter2D(Collision2D col)
@@ -229,48 +252,35 @@ public class Monster_Elite : Monster
             ////Vector2 vel = collision.gameObject.GetComponent<Rigidbody2D>().velocity;
             //rigid.AddForce(new Vector2(dir.x, dir.y) * 0.5f, ForceMode2D.Force);
         }
-        //
-        //if (collision.gameObject.layer == 9) //MonsterAttack
-        //    OnDamaged(collision.gameObject.transform.position, 1);
     }
 
-    private void OnTriggerEnter2D(Collider2D col)
-    {
-        if (col.gameObject.tag == "Player")
-        {
-            chasePath = pathfinder.FindPath(col.transform.position);
-            print("EnterCount : " + chasePath.Count);
-            for (int i = 0; i < chasePath.Count; i++)
-            {
-                //chasePath[i] -= new Vector2Int(9, 0);
-                //chasePath[i] += new Vector2Int(0, 1);
-                print(i + "번째 위치 : " + chasePath[i]);
-            }
 
-            state.SetPathfind();
-        }
-    }
 
-    //private void OnTriggerStay2D(Collider2D col)
+    //private void OnTriggerEnter2D(Collider2D col)
     //{
-    //    if (col.gameObject.tag == "Player" && chaseTime >= 3.0f)
+    //    if (col.gameObject.tag == "Player")
     //    {
-    //        pathfinder.ReFindPath(col.transform.position);
-    //        pathIndex = 0;
-    //        bResetPath = true;
-    //        chaseTime = 0.0f;
+    //        targetPos = col.transform.position;
+    //        state.SetMove();
     //    }
     //}
 
-    private void OnTriggerExit2D(Collider2D col)
-    {
-        if (col.gameObject.tag == "Player")
-        {  
-            print("Exit_Path");
-            bResetPath = false;
-            state.SetIdle();
-            chaseTime = 0.0f;
-            chasePath.Clear();        
-        }
-    }
+    //private void OnTriggerStay2D(Collider2D col)
+    //{
+    //    if (!state.IsMove() && col.gameObject.tag == "Player" && moveOffsetTime >= 2.0f && !state.IsGroggy())
+    //    {
+    //        moveOffsetTime = 0.0f;
+    //        targetPos = col.transform.position;
+    //        //state.SetMove();
+    //    }
+    //}
+    //
+    //private void OnTriggerExit2D(Collider2D col)
+    //{
+    //    if (state.IsMove() && col.gameObject.tag == "Player")
+    //    {
+    //        moveOffsetTime = 0.0f;
+    //        state.SetIdle();
+    //    }
+    //}
 }
