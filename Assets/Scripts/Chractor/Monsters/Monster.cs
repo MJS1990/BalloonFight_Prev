@@ -10,8 +10,7 @@ using static UnityEngine.GraphicsBuffer;
 
 public class Monster : MonoBehaviour
 {
-    [SerializeField]
-    protected PlayerStatus player;
+    //protected PlayerStatus player;
 
     protected MonsterState state;
     protected MonsterStatus status;
@@ -19,13 +18,13 @@ public class Monster : MonoBehaviour
     protected int maxhp;
     protected int currenthp;
     public float attachmentImpact = 2.0f;
-    public float moveSpeed = 5.0f;
-    public float minSpeed = 5.0f;
-    public float maxSpeed = 8.0f;
-    public float moveOffset = 0.05f;
-    public float moveForce = 0.0f;
-    public float jumpPower = 5.0f;
-    public float moveOffsetTime = 0.0f;
+    protected float moveSpeed = 5.0f;
+    [SerializeField] protected float minSpeed = 5.0f;
+    [SerializeField] protected float maxSpeed = 8.0f;
+    [SerializeField] protected float moveOffset = 0.05f;
+    [SerializeField] protected float moveForce = 0.0f;
+    [SerializeField] protected float jumpPower = 5.0f;
+    [SerializeField] protected float moveOffsetTime = 0.0f;
 
     //Patrol
     protected LineRenderer patrolPath;
@@ -33,11 +32,14 @@ public class Monster : MonoBehaviour
 
     //PathFind
     //protected Monster_Pathfinding pathfinder;
+    [SerializeField]
+    protected float playerDetectionRange = 4.5f;
     protected List<Vector2Int> chasePath;
     protected GameObject target;
     protected Vector3 targetPos;
+    protected List<Vector3> patrolPoints;
     protected Vector3 pathPointPos;
-    protected Vector2 pathMoveOffset;
+    protected Vector3 pathMoveOffset;
     protected int pathIndex = 0;
     protected bool bArrived = false;
     protected float chaseTime = 0.0f;
@@ -74,34 +76,57 @@ public class Monster : MonoBehaviour
     public void Awake()
     {
         target = GameObject.Find("Player");
+        //player = target.GetComponent<PlayerStatus>();
     }
 
+    //public bool Patrol()
+    //{
+    //    if (patrolPath == null || patrolPath.positionCount <= 0)
+    //        return false;
+    //
+    //    targetPos = patrolPath.GetPosition(patrolIndex);
+    //
+    //    if (MoveTo())
+    //    {
+    //        print("alive targetPos : " + targetPos);
+    //        if (patrolIndex == (patrolPath.positionCount - 1))
+    //            patrolIndex = 0;
+    //        else
+    //            patrolIndex++;
+    //    }
+    //
+    //    PatrolCount++;
+    //    return true;
+    //}
     public bool Patrol()
     {
-        if (patrolPath == null || patrolPath.positionCount <= 0)
+        if (patrolPoints == null || patrolPoints.Count <= 0)
             return false;
 
-        targetPos = patrolPath.GetPosition(patrolIndex);
+        targetPos = patrolPoints[patrolIndex];
 
         if (MoveTo())
         {
-            if (patrolIndex == (patrolPath.positionCount - 1))
+            if (patrolIndex == (patrolPoints.Count - 1))
                 patrolIndex = 0;
             else
                 patrolIndex++;
         }
 
         PatrolCount++;
-
         return true;
     }
+
     public bool MoveTo()
     {
         Vector3 dir = targetPos - transform.position;
         dir.Normalize();
-        transform.position += dir * moveSpeed * Time.deltaTime;
+        transform.position += (dir * moveSpeed) * Time.deltaTime;
         //rigid.AddForce(dir * moveSpeed, ForceMode2D.Force); //Force
-        moveSpeed -= 0.3f;
+        if ((moveSpeed - 0.3f) >= 0.0f)
+            moveSpeed -= 0.3f;
+        else
+            moveSpeed = 0.0f;
 
         ////Jump
         //if (target.y > transform.position.y)
@@ -113,7 +138,7 @@ public class Monster : MonoBehaviour
         Vector3 min = new Vector3(targetPos.x - moveOffset, targetPos.y - moveOffset, targetPos.z);
         Vector3 max = new Vector3(targetPos.x + moveOffset, targetPos.y + moveOffset, targetPos.z);
         //µµÂøÇß´Ù¸é true
-        if ((transform.position.x > min.x && transform.position.y > min.y) && (transform.position.x < max.x && transform.position.y < max.y))
+        if ((transform.position.x > min.x && transform.position.x < max.x) && (transform.position.y > min.y && transform.position.y < max.y))
         {
             state.SetIdle();
             return true;
